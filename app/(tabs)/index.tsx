@@ -1,103 +1,257 @@
-import { Image } from "expo-image";
-import { Platform, StyleSheet } from "react-native";
-import ParallaxScrollView from "@/components/parallax-scroll-view";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { Link} from "expo-router";
-import { Button } from "react-native";
-import { useRouter } from "expo-router";
+import { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Alert,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function HomeScreen() {
   const router = useRouter();
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-      headerImage={
-        <Image
-          source={require("@/assets/images/partial-react-logo.png")}
-          style={styles.reactLogo}
-        />
-      }
-    >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Voice Commute</ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">
-          Your smart AI-powered commute assistant. Plan routes with just your
-          voice
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Voice control</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction
-              title="Action"
-              icon="cube"
-              onPress={() => alert("Action pressed")}
-            />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert("Share pressed")}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert("Delete pressed")}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Smart Routes</ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Weather Aware</ThemedText>
-      </ThemedView>
+  const [userName, setUserName] = useState('');
 
-       <ThemedView style={styles.buttonContainer}>
-    
-    <Button title="Create Account" onPress={() => router.push("/auth/createAccount")} />
-  </ThemedView>
-      
-    </ParallaxScrollView>
+  useEffect(() => {
+    loadUserData();
+  }, []);
+
+  const loadUserData = async () => {
+    const name = await AsyncStorage.getItem('userName');
+    setUserName(name || 'User');
+  };
+
+  const handleLogout = () => {
+    Alert.alert('Logout', 'Are you sure you want to logout?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Logout',
+        style: 'destructive',
+        onPress: async () => {
+          await AsyncStorage.clear();
+          router.replace('/auth/welcome');
+        },
+      },
+    ]);
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView>
+        {/* Header */}
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.greeting}>Good Morning, {userName}!</Text>
+            <Text style={styles.subGreeting}>Where would you like to go?</Text>
+          </View>
+          <TouchableOpacity onPress={handleLogout}>
+            <Text style={styles.logoutIcon}>🚪</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Weather Card */}
+        <View style={styles.weatherCard}>
+          <View>
+            <Text style={styles.weatherTemp}>☁️ 24°C</Text>
+            <Text style={styles.weatherDesc}>Partly Cloudy</Text>
+          </View>
+          <View style={styles.weatherRight}>
+            <Text style={styles.weatherCondition}>Good conditions</Text>
+            <Text style={styles.weatherSub}>for driving</Text>
+          </View>
+        </View>
+
+        {/* Voice Button */}
+        <View style={styles.voiceContainer}>
+          <TouchableOpacity
+            style={styles.voiceButton}
+            // onPress={() => router.push('/voice')}
+          >
+            <View style={styles.pulseRing} />
+            <Text style={styles.voiceIcon}>🎙️</Text>
+          </TouchableOpacity>
+          <Text style={styles.voiceHint}>Tap to speak or say "Hey Commute"</Text>
+        </View>
+
+        {/* Quick Access */}
+        <View style={styles.quickAccess}>
+          <Text style={styles.sectionTitle}>QUICK ACCESS</Text>
+
+          <TouchableOpacity
+            style={styles.quickCard}
+            onPress={() => router.push('/route-display')}
+          >
+            <View style={styles.quickCardContent}>
+              <Text style={styles.quickIcon}>🏢</Text>
+              <View>
+                <Text style={styles.quickTitle}>Go to Office</Text>
+                <Text style={styles.quickSubtitle}>Usually 25 min</Text>
+              </View>
+            </View>
+            <Text style={styles.arrow}>→</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.quickCard}
+            onPress={() => router.push('/route-display')}
+          >
+            <View style={styles.quickCardContent}>
+              <Text style={styles.quickIcon}>🏠</Text>
+              <View>
+                <Text style={styles.quickTitle}>Go Home</Text>
+                <Text style={styles.quickSubtitle}>Usually 30 min</Text>
+              </View>
+            </View>
+            <Text style={styles.arrow}>→</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.quickCard}
+            onPress={() => router.push('/route-display')}
+          >
+            <View style={styles.quickCardContent}>
+              <Text style={styles.quickIcon}>☕</Text>
+              <View>
+                <Text style={styles.quickTitle}>Coffee Shop</Text>
+                <Text style={styles.quickSubtitle}>10 min away</Text>
+              </View>
+            </View>
+            <Text style={styles.arrow}>→</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    justifyContent: "center",
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-    alignItems: "center",
-    justifyContent: "center",
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: "absolute",
+  greeting: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1a1a1a',
   },
-  buttonContainer: {
-  marginTop: 20,
-  marginBottom: 50, // give some bottom space
-  width: "80%",
-  alignSelf: "center",
-  gap: 12, // space between buttons (works with RN 0.71+)
-},
-
+  subGreeting: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 5,
+  },
+  logoutIcon: {
+    fontSize: 24,
+  },
+  weatherCard: {
+    backgroundColor: '#3b82f6',
+    margin: 20,
+    padding: 20,
+    borderRadius: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  weatherTemp: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  weatherDesc: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.9)',
+    marginTop: 5,
+  },
+  weatherRight: {
+    alignItems: 'flex-end',
+  },
+  weatherCondition: {
+    fontSize: 14,
+    color: '#fff',
+  },
+  weatherSub: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.8)',
+  },
+  voiceContainer: {
+    alignItems: 'center',
+    marginVertical: 40,
+  },
+  voiceButton: {
+    width: 130,
+    height: 130,
+    borderRadius: 65,
+    backgroundColor: '#667eea',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  pulseRing: {
+    position: 'absolute',
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    borderWidth: 3,
+    borderColor: '#667eea',
+    opacity: 0.3,
+  },
+  voiceIcon: {
+    fontSize: 60,
+  },
+  voiceHint: {
+    marginTop: 15,
+    fontSize: 14,
+    color: '#666',
+  },
+  quickAccess: {
+    padding: 20,
+  },
+  sectionTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#999',
+    marginBottom: 15,
+    letterSpacing: 0.5,
+  },
+  quickCard: {
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    padding: 15,
+    marginBottom: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  quickCardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 15,
+  },
+  quickIcon: {
+    fontSize: 28,
+  },
+  quickTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1a1a1a',
+  },
+  quickSubtitle: {
+    fontSize: 12,
+    color: '#999',
+    marginTop: 2,
+  },
+  arrow: {
+    fontSize: 20,
+    color: '#ccc',
+  },
 });
+
+

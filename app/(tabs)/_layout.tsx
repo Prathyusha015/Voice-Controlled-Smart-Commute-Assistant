@@ -1,33 +1,55 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
-
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Text } from 'react-native'; // ✅ Make sure to import Text
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
+        tabBarActiveTintColor: '#667eea',
+        tabBarInactiveTintColor: '#999',
+        tabBarStyle: {
+          borderTopWidth: 1,
+          borderTopColor: '#e5e5e5',
+          paddingBottom: 5,
+          height: 60,
+        },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarIcon: ({ color, size }) => ( // ✅ Use props
+            <Text style={{ fontSize: size, color }}>🏠</Text>
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="routes"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Routes',
+          tabBarIcon: ({ color, size }) => (
+            <Text style={{ fontSize: size, color }}>🗺️</Text>
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarIcon: ({ color, size }) => (
+            <Text style={{ fontSize: size, color }}>⚙️</Text>
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="history"
+        options={{
+          title: 'History',
+          tabBarIcon: ({ color, size }) => (
+            <Text style={{ fontSize: size, color }}>🕐</Text>
+          ),
         }}
       />
     </Tabs>
