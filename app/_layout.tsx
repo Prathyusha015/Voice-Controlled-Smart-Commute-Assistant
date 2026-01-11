@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useState } from 'react';
 
 export default function RootLayout() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -8,32 +7,32 @@ export default function RootLayout() {
   const segments = useSegments();
   const router = useRouter();
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
+  // useEffect(() => {
+  //   checkAuth();
+  // }, []);
 
-  useEffect(() => {
-    if (isLoading) return;
+  // useEffect(() => {
+  //   if (isLoading) return;
 
-    const inAuthGroup = segments[0] === 'auth';
+  //   const inAuthGroup = segments[0] === 'auth';
 
-    if (!isAuthenticated && !inAuthGroup) {
-      router.replace('/auth/welcome');
-    } else if (isAuthenticated && inAuthGroup) {
-      router.replace('/(tabs)');
-    }
-  }, [isAuthenticated, segments, isLoading]);
+  //   if (!isAuthenticated && !inAuthGroup) {
+  //     router.replace('/auth/welcome');
+  //   } else if (isAuthenticated && inAuthGroup) {
+  //     router.replace('/(tabs)');
+  //   }
+  // }, [isAuthenticated, segments, isLoading]);
 
-  const checkAuth = async () => {
-    try {
-      const token = await AsyncStorage.getItem('authToken');
-      setIsAuthenticated(token !== null);
-    } catch (error) {
-      console.log('Auth check error:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // const checkAuth = async () => {
+  //   try {
+  //     const token = await AsyncStorage.getItem('authToken');
+  //     setIsAuthenticated(token !== null);
+  //   } catch (error) {
+  //     console.log('Auth check error:', error);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   return (
     <Stack screenOptions={{ headerShown: false }}>

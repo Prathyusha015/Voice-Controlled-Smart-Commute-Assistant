@@ -1,13 +1,22 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function WelcomeScreen() {
   const router = useRouter();
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Logo */}
         <View style={styles.logoContainer}>
           <View style={styles.logo}>
@@ -37,7 +46,9 @@ export default function WelcomeScreen() {
             </View>
             <View style={styles.featureText}>
               <Text style={styles.featureTitle}>Smart Routes</Text>
-              <Text style={styles.featureSubtitle}>AI-optimized suggestions</Text>
+              <Text style={styles.featureSubtitle}>
+                AI-optimized suggestions
+              </Text>
             </View>
           </View>
 
@@ -63,26 +74,25 @@ export default function WelcomeScreen() {
 
           <TouchableOpacity
             style={styles.secondaryButton}
-            // onPress={() => router.push('/auth/signin')}
+            onPress={() => router.push('/auth/login')}
           >
             <Text style={styles.secondaryButtonText}>
               I Already Have an Account
             </Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
   },
   content: {
-    flex: 1,
     padding: 20,
+    flexGrow: 1,
   },
   logoContainer: {
     alignItems: 'center',
@@ -114,8 +124,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
   },
   featuresContainer: {
-    flex: 1,
-    justifyContent: 'center',
+    marginBottom: 30,
   },
   featureItem: {
     flexDirection: 'row',
