@@ -1,10 +1,13 @@
+import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -13,15 +16,22 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+const SOCIAL_ICONS: { [key: string]: string } = {
+  facebook: 'https://www.svgrepo.com/show/475656/facebook-color.svg',
+  google: 'https://www.svgrepo.com/show/475656/google-color.svg',
+  apple: 'https://www.svgrepo.com/show/475656/apple-color.svg',
+};
+
 export default function SignUpScreen() {
   const router = useRouter();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSignUp = async () => {
-    if (!fullName || !email || !password) {
+    if (!fullName || !email || !password || !confirmPassword) {
       Alert.alert('Error', 'Please fill all fields');
       return;
     }
@@ -31,14 +41,19 @@ export default function SignUpScreen() {
       return;
     }
 
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match');
+      return;
+    }
+
     setLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       await AsyncStorage.setItem('authToken', 'demo-token-123');
       await AsyncStorage.setItem('userEmail', email);
       await AsyncStorage.setItem('userName', fullName);
-      
+
       Alert.alert('Success', 'Account created successfully!');
       router.replace('/(tabs)');
     } catch (error) {
@@ -51,75 +66,100 @@ export default function SignUpScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.backButtonText}>← Back</Text>
-        </TouchableOpacity>
-
-        <View style={styles.header}>
-          <Text style={styles.title}>Create Account</Text>
-          <Text style={styles.subtitle}>Sign up to save your preferences</Text>
-        </View>
-
-        <View style={styles.form}>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Full Name</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="John Doe"
-              value={fullName}
-              onChangeText={setFullName}
-              autoCapitalize="words"
-            />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email Address</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="john@example.com"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="••••••••"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-            />
-          </View>
-
-          <TouchableOpacity
-            style={[styles.primaryButton, loading && styles.buttonDisabled]}
-            onPress={handleSignUp}
-            disabled={loading}
-          >
-            <Text style={styles.primaryButtonText}>
-              {loading ? 'Creating Account...' : 'Create Account'}
-            </Text>
-          </TouchableOpacity>
-
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Already have an account? </Text>
-            <TouchableOpacity onPress={() => router.push('/auth/login')}>
-              <Text style={styles.linkText}>Sign In</Text>
+          {/* Top Section: Back Button + Header + Form */}
+          <View style={styles.topSection}>
+            {/* Back Button */}
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={styles.backButton}
+            >
+              <Feather name="chevron-left" size={28} color="#1E232C" />
             </TouchableOpacity>
-          </View>
-        </View>
 
-       
+            {/* Header */}
+            <View style={styles.header}>
+              <Text style={styles.title}>Hello! Register to get started</Text>
+            </View>
+
+            {/* Form */}
+            <View style={styles.form}>
+              <TextInput
+                style={styles.input}
+                placeholder="Full Name"
+                value={fullName}
+                onChangeText={setFullName}
+                autoCapitalize="words"
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Email Address"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Password"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry
+              />
+
+              <TouchableOpacity
+                style={[styles.primaryButton, loading && styles.buttonDisabled]}
+                onPress={handleSignUp}
+                disabled={loading}
+              >
+                <Text style={styles.primaryButtonText}>
+                  {loading ? 'Creating Account...' : 'Create Account'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Bottom Section: Social Logins + Footer */}
+          <View style={styles.bottomSection}>
+            <View style={styles.divider}>
+              <View style={styles.line} />
+              <Text style={styles.dividerText}>Or Sign up with</Text>
+              <View style={styles.line} />
+            </View>
+
+            <View style={styles.socialButtons}>
+              {Object.keys(SOCIAL_ICONS).map((key) => (
+                <TouchableOpacity key={key} style={styles.socialButton}>
+                  <Image
+                    source={{ uri: SOCIAL_ICONS[key] }}
+                    style={styles.socialIcon}
+                    resizeMode="contain"
+                  />
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>Already have an account? </Text>
+              <TouchableOpacity onPress={() => router.push('/auth/login')}>
+                <Text style={styles.footerLink}>Sign In</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -129,52 +169,46 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    padding: 20,
   },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'space-between', // pushes bottomSection to bottom
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 20,
+  },
+  topSection: {},
   backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
     marginBottom: 20,
-  },
-  backButtonText: {
-    fontSize: 18,
-    color: '#667eea',
   },
   header: {
-    marginBottom: 40,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#1a1a1a',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-  },
-  form: {
-    flex: 1,
-  },
-  inputGroup: {
     marginBottom: 20,
   },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#1E232C',
+    lineHeight: 36,
+  },
+  form: {
+    marginBottom: 20,
   },
   input: {
-    backgroundColor: '#f8f9fa',
-    padding: 15,
+    backgroundColor: '#F3F4F6',
+    padding: 14,
     borderRadius: 12,
     fontSize: 16,
-    borderWidth: 2,
-    borderColor: '#e5e5e5',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    marginBottom: 16,
   },
   primaryButton: {
-    backgroundColor: '#667eea',
-    padding: 18,
-    borderRadius: 15,
+    backgroundColor: '#1E232C',
+    padding: 16,
+    borderRadius: 14,
     alignItems: 'center',
     marginTop: 10,
   },
@@ -186,18 +220,55 @@ const styles = StyleSheet.create({
   buttonDisabled: {
     opacity: 0.6,
   },
+  bottomSection: {
+    marginTop: 20,
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  line: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#E5E7EB',
+  },
+  dividerText: {
+    marginHorizontal: 10,
+    fontSize: 12,
+    color: '#9CA3AF',
+    fontWeight: '500',
+  },
+  socialButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  socialButton: {
+    flex: 1,
+    height: 56,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 4,
+  },
+  socialIcon: {
+    width: 24,
+    height: 24,
+  },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 20,
   },
   footerText: {
-    color: '#666',
+    color: '#1E232C',
     fontSize: 14,
   },
-  linkText: {
-    color: '#667eea',
-    fontSize: 14,
+  footerLink: {
+    color: '#35C2C1',
     fontWeight: '600',
+    fontSize: 14,
   },
 });

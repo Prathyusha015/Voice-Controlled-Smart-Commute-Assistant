@@ -1,6 +1,7 @@
+import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import {
-  ScrollView,
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -13,175 +14,165 @@ export default function WelcomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Logo */}
-        <View style={styles.logoContainer}>
-          <View style={styles.logo}>
-            <Text style={styles.logoEmoji}>🎙️</Text>
-          </View>
-          <Text style={styles.title}>Voice Commute</Text>
-          <Text style={styles.subtitle}>
-            Your smart AI-powered commute assistant
-          </Text>
-        </View>
+      <View style={styles.contentWrapper}>
 
-        {/* Features */}
-        <View style={styles.featuresContainer}>
-          <View style={styles.featureItem}>
-            <View style={styles.featureIcon}>
-              <Text style={styles.featureEmoji}>🎤</Text>
-            </View>
-            <View style={styles.featureText}>
-              <Text style={styles.featureTitle}>Voice Control</Text>
-              <Text style={styles.featureSubtitle}>Hands-free navigation</Text>
-            </View>
+        {/* TOP CONTENT */}
+        <View style={styles.topSection}>
+
+          {/* IMAGE */}
+          <View style={styles.imageWrapper}>
+            <Image
+              source={{ uri: 'https://picsum.photos/seed/commute/600/800' }}
+              style={styles.image}
+              resizeMode="cover"
+            />
           </View>
 
-          <View style={styles.featureItem}>
-            <View style={styles.featureIcon}>
-              <Text style={styles.featureEmoji}>🗺️</Text>
+          {/* TITLE + ICON */}
+          <View style={styles.textBlock}>
+            <View style={styles.titleRow}>
+              <View style={styles.smallIcon}>
+                <Feather name="mic" size={16} color="#fff" />
+              </View>
+              <Text style={styles.title}>Commutely</Text>
             </View>
-            <View style={styles.featureText}>
-              <Text style={styles.featureTitle}>Smart Routes</Text>
-              <Text style={styles.featureSubtitle}>
-                AI-optimized suggestions
-              </Text>
-            </View>
-          </View>
 
-          <View style={styles.featureItem}>
-            <View style={styles.featureIcon}>
-              <Text style={styles.featureEmoji}>☁️</Text>
-            </View>
-            <View style={styles.featureText}>
-              <Text style={styles.featureTitle}>Weather Aware</Text>
-              <Text style={styles.featureSubtitle}>Real-time conditions</Text>
-            </View>
+            <Text style={styles.subtitle}>
+              Your voice-powered smart commute assistant
+            </Text>
           </View>
         </View>
 
-        {/* Buttons */}
+        {/* BUTTONS */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.primaryButton}
-            onPress={() => router.push('/auth/signup')}
+            onPress={() => router.push('/auth/login')}
           >
-            <Text style={styles.primaryButtonText}>Get Started</Text>
+            <Text style={styles.primaryButtonText}>Login</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.secondaryButton}
-            onPress={() => router.push('/auth/login')}
+            onPress={() => router.push('/auth/signup')}
           >
-            <Text style={styles.secondaryButtonText}>
-              I Already Have an Account
-            </Text>
+            <Text style={styles.secondaryButtonText}>Register</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.guestButton}>
+            <Text style={styles.guestButtonText}>Continue as guest</Text>
           </TouchableOpacity>
         </View>
-      </ScrollView>
+
+      </View>
     </SafeAreaView>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
   },
-  content: {
-    padding: 20,
-    flexGrow: 1,
+
+  contentWrapper: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingBottom: 30,
   },
-  logoContainer: {
-    alignItems: 'center',
-    marginTop: 60,
-    marginBottom: 40,
-  },
-  logo: {
-    width: 120,
-    height: 120,
-    backgroundColor: '#667eea',
-    borderRadius: 30,
-    alignItems: 'center',
+
+  topSection: {
+    flex: 1,
     justifyContent: 'center',
-    marginBottom: 20,
   },
-  logoEmoji: {
-    fontSize: 60,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#1a1a1a',
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    paddingHorizontal: 40,
-  },
-  featuresContainer: {
+
+  imageWrapper: {
+    borderRadius: 20,
+    overflow: 'hidden',
     marginBottom: 30,
   },
-  featureItem: {
+
+  image: {
+    width: '100%',
+    height: 360,
+  },
+
+  textBlock: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+
+  titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 25,
+    gap: 8,
+    marginBottom: 6,
   },
-  featureIcon: {
-    width: 50,
-    height: 50,
-    backgroundColor: '#f0f0ff',
-    borderRadius: 12,
+
+  smallIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    backgroundColor: '#35C2C1',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  featureEmoji: {
-    fontSize: 26,
+
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#1E232C',
   },
-  featureText: {
-    marginLeft: 15,
-    flex: 1,
-  },
-  featureTitle: {
+
+  subtitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#1a1a1a',
-    marginBottom: 3,
+    color: '#8391A1',
+    textAlign: 'center',
+    paddingHorizontal: 10,
   },
-  featureSubtitle: {
-    fontSize: 14,
-    color: '#999',
-  },
+
   buttonContainer: {
-    paddingBottom: 40,
+    marginTop: 10,
   },
+
   primaryButton: {
-    backgroundColor: '#667eea',
+    backgroundColor: '#1E232C',
     padding: 18,
     borderRadius: 15,
     alignItems: 'center',
     marginBottom: 12,
   },
+
   primaryButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
   },
+
   secondaryButton: {
     backgroundColor: '#fff',
     padding: 16,
     borderRadius: 15,
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#667eea',
+    borderColor: '#1E232C',
+    marginBottom: 10,
   },
+
   secondaryButtonText: {
-    color: '#667eea',
+    color: '#1E232C',
     fontSize: 16,
+    fontWeight: '600',
+  },
+
+  guestButton: {
+    alignItems: 'center',
+    marginTop: 6,
+  },
+
+  guestButtonText: {
+    color: '#35C2C1',
+    fontSize: 14,
     fontWeight: '600',
   },
 });

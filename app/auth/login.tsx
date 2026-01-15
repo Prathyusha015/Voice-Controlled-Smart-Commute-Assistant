@@ -1,10 +1,11 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
-  Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -13,95 +14,112 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function SignInScreen() {
+const SOCIAL_ICONS: { [key: string]: string } = {
+  facebook: 'https://www.svgrepo.com/show/475656/facebook-color.svg',
+  google: 'https://www.svgrepo.com/show/475656/google-color.svg',
+  apple: 'https://www.svgrepo.com/show/475656/apple-color.svg',
+};
+
+export default function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  const handleSignIn = async () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please fill all fields');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      await AsyncStorage.setItem('authToken', 'demo-token-123');
-      await AsyncStorage.setItem('userEmail', email);
-      
-      router.replace('/(tabs)');
-    } catch (error) {
-      Alert.alert('Error', 'Invalid credentials');
-    } finally {
-      setLoading(false);
-    }
+  const handleLogin = () => {
+    console.log('Logging in with:', { email, password });
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <Text style={styles.backButtonText}>← Back</Text>
-        </TouchableOpacity>
-
-        <View style={styles.header}>
-          <Text style={styles.title}>Welcome Back</Text>
-          <Text style={styles.subtitle}>Sign in to continue your journey</Text>
-        </View>
-
-        <View style={styles.form}>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email Address</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="john@example.com"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="••••••••"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-            />
-          </View>
-
-          <TouchableOpacity style={styles.forgotPassword}>
-            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.primaryButton, loading && styles.buttonDisabled]}
-            onPress={handleSignIn}
-            disabled={loading}
+        <View style={styles.container}>
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
           >
-            <Text style={styles.primaryButtonText}>
-              {loading ? 'Signing In...' : 'Sign In'}
-            </Text>
-          </TouchableOpacity>
-
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Don't have an account? </Text>
-            <TouchableOpacity onPress={() => router.push('/auth/signup')}>
-              <Text style={styles.linkText}>Sign Up</Text>
+            {/* Back Button */}
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={styles.backButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Feather name="chevron-left" size={28} color="#1E232C" />
             </TouchableOpacity>
-          </View>
+
+            {/* Main content */}
+            <View style={styles.mainContent}>
+              {/* Header */}
+              <View style={styles.header}>
+                <Text style={styles.title}>
+                  Welcome back!{'\n'}Glad to see you, Again!
+                </Text>
+              </View>
+
+              {/* Form */}
+              <View style={styles.form}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter your email"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+                <View style={{ position: 'relative' }}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Enter your password"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry
+                  />
+                  <TouchableOpacity style={styles.passwordToggle}>
+                    <Feather name="eye" size={20} color="#9CA3AF" />
+                  </TouchableOpacity>
+                </View>
+
+                <TouchableOpacity style={styles.forgot}>
+                  <Text style={styles.forgotText}>Forgot Password?</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.primaryButton} onPress={handleLogin}>
+                  <Text style={styles.primaryButtonText}>Login</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Social Login (Bottom) */}
+            <View style={styles.socialSection}>
+              <View style={styles.divider}>
+                <View style={styles.line} />
+                <Text style={styles.dividerText}>Or Login with</Text>
+                <View style={styles.line} />
+              </View>
+
+              <View style={styles.socialButtons}>
+                {Object.keys(SOCIAL_ICONS).map((key) => (
+                  <TouchableOpacity key={key} style={styles.socialButton}>
+                    <Image
+                      source={{ uri: SOCIAL_ICONS[key] }}
+                      style={styles.socialIcon}
+                      resizeMode="contain"
+                    />
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {/* Footer */}
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>Don't have an account? </Text>
+              <TouchableOpacity onPress={() => router.push('/auth/signup')}>
+                <Text style={styles.footerLink}>Register Now</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -111,62 +129,62 @@ export default function SignInScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    padding: 20,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 20,
+    paddingTop: 30, // spacing from status bar
+    paddingBottom: 40,
+    justifyContent: 'space-between', // push social login to bottom
   },
   backButton: {
     marginBottom: 20,
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
   },
-  backButtonText: {
-    fontSize: 18,
-    color: '#667eea',
-  },
-  header: {
-    marginBottom: 40,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#1a1a1a',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-  },
-  form: {
+  mainContent: {
     flex: 1,
   },
-  inputGroup: {
+  header: {
     marginBottom: 20,
   },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#1E232C',
+    lineHeight: 36,
+  },
+  form: {
+    marginBottom: 10,
   },
   input: {
-    backgroundColor: '#f8f9fa',
-    padding: 15,
+    backgroundColor: '#F3F4F6',
+    padding: 14,
     borderRadius: 12,
     fontSize: 16,
-    borderWidth: 2,
-    borderColor: '#e5e5e5',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    marginBottom: 16,
   },
-  forgotPassword: {
+  passwordToggle: {
+    position: 'absolute',
+    right: 12,
+    top: 14,
+  },
+  forgot: {
     alignSelf: 'flex-end',
     marginBottom: 20,
   },
-  forgotPasswordText: {
-    color: '#667eea',
+  forgotText: {
     fontSize: 14,
+    color: '#35C2C1',
     fontWeight: '600',
   },
   primaryButton: {
-    backgroundColor: '#667eea',
-    padding: 18,
-    borderRadius: 15,
+    backgroundColor: '#1E232C',
+    padding: 16,
+    borderRadius: 14,
     alignItems: 'center',
   },
   primaryButtonText: {
@@ -174,8 +192,42 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  buttonDisabled: {
-    opacity: 0.6,
+  socialSection: {
+    marginTop: 20,
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  line: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#E5E7EB',
+  },
+  dividerText: {
+    marginHorizontal: 10,
+    fontSize: 12,
+    color: '#9CA3AF',
+    fontWeight: '500',
+  },
+  socialButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  socialButton: {
+    flex: 1,
+    height: 56,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 4,
+  },
+  socialIcon: {
+    width: 24,
+    height: 24,
   },
   footer: {
     flexDirection: 'row',
@@ -183,13 +235,12 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   footerText: {
-    color: '#666',
+    color: '#1E232C',
     fontSize: 14,
   },
-  linkText: {
-    color: '#667eea',
-    fontSize: 14,
+  footerLink: {
+    color: '#35C2C1',
     fontWeight: '600',
+    fontSize: 14,
   },
 });
-
