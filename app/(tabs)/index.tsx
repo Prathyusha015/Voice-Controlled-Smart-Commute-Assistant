@@ -1,18 +1,20 @@
+import { useAuth } from '@/app/context/AuthContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
-  View,
+  Alert,
+  ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Alert,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { logout } = useAuth();
   const [userName, setUserName] = useState('');
 
   useEffect(() => {
@@ -31,7 +33,7 @@ export default function HomeScreen() {
         text: 'Logout',
         style: 'destructive',
         onPress: async () => {
-          await AsyncStorage.clear();
+          await logout();
           router.replace('/auth/welcome');
         },
       },
@@ -68,7 +70,7 @@ export default function HomeScreen() {
         <View style={styles.voiceContainer}>
           <TouchableOpacity
             style={styles.voiceButton}
-            // onPress={() => router.push('/voice')}
+            onPress={() => router.push('/voice-app')}
           >
             <View style={styles.pulseRing} />
             <Text style={styles.voiceIcon}>🎙️</Text>

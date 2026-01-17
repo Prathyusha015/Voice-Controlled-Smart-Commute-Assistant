@@ -1,5 +1,5 @@
+import { useAuth } from '@/app/context/AuthContext';
 import { Feather } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -24,6 +24,7 @@ const SOCIAL_ICONS: { [key: string]: string } = {
 
 export default function SignUpScreen() {
   const router = useRouter();
+  const { login } = useAuth();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -50,10 +51,7 @@ export default function SignUpScreen() {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      await AsyncStorage.setItem('authToken', 'demo-token-123');
-      await AsyncStorage.setItem('userEmail', email);
-      await AsyncStorage.setItem('userName', fullName);
-
+      await login('demo-token-123', fullName);
       Alert.alert('Success', 'Account created successfully!');
       router.replace('/(tabs)');
     } catch (error) {

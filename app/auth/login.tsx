@@ -1,3 +1,4 @@
+import { useAuth } from '@/app/context/AuthContext';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -22,11 +23,14 @@ const SOCIAL_ICONS: { [key: string]: string } = {
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     console.log('Logging in with:', { email, password });
+    await login('dummy_token', email.split('@')[0]);
+    router.replace('/(tabs)');
   };
 
   return (

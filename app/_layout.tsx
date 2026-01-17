@@ -1,46 +1,46 @@
+import { AuthProvider, useAuth } from '@/app/context/AuthContext';
 import { Stack, useRouter, useSegments } from 'expo-router';
-import { useState } from 'react';
+import * as SplashScreen from 'expo-splash-screen';
+import { useEffect } from 'react';
 
-export default function RootLayout() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
+
+function NavigationHelper() {
+  const { isAuthenticated, isLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
 
-  // useEffect(() => {
-  //   checkAuth();
-  // }, []);
+  useEffect(() => {
+    if (isLoading) return;
 
-  // useEffect(() => {
-  //   if (isLoading) return;
+    const inAuthGroup = segments[0] === 'auth';
 
-  //   const inAuthGroup = segments[0] === 'auth';
+    if (!isAuthenticated && !inAuthGroup) {
+      router.replace('/auth/welcome');
+    } else if (isAuthenticated && inAuthGroup) {
+      router.replace('/(tabs)');
+    }
 
-  //   if (!isAuthenticated && !inAuthGroup) {
-  //     router.replace('/auth/welcome');
-  //   } else if (isAuthenticated && inAuthGroup) {
-  //     router.replace('/(tabs)');
-  //   }
-  // }, [isAuthenticated, segments, isLoading]);
-
-  // const checkAuth = async () => {
-  //   try {
-  //     const token = await AsyncStorage.getItem('authToken');
-  //     setIsAuthenticated(token !== null);
-  //   } catch (error) {
-  //     console.log('Auth check error:', error);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
+    if (!isLoading) {
+      SplashScreen.hideAsync();
+    }
+  }, [isAuthenticated, segments, isLoading]);
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="auth" />
       <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="voice" />
+      <Stack.Screen name="voice-app" />
       <Stack.Screen name="route-display" />
     </Stack>
   );
 }
 
+export default function RootLayout() {
+  return (
+    <AuthProvider>
+      <NavigationHelper />
+    </AuthProvider>
+  );
+}
